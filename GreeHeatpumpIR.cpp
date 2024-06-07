@@ -142,7 +142,7 @@ GreeYANHeatpumpIR::GreeYANHeatpumpIR() : GreeHeatpumpIR()
 }
 
 // Support for YAA1FB, FAA1FB1, YB1F2 remotes
-GreeYAAHeatpumpIR::GreeYAAHeatpumpIR() : GreeHeatpumpIR()
+GreeYAAHeatpumpIR::GreeYAAHeatpumpIR() : GreeiFeelHeatpumpIR()
 {
   static const char model[] PROGMEM = "greeyaa";
   static const char info[]  PROGMEM = "{\"mdl\":\"greeyaa\",\"dn\":\"Gree YAA\",\"mT\":16,\"xT\":30,\"fs\":3}";
@@ -189,8 +189,8 @@ const GreeHeatpumpIR::Timings & GreeHeatpumpIR::getTimings() const {
         1600,
         540,
         19000,
-        8200,
-        3800,
+        6000, // 8200, : new value doesn't work on YAA1FB
+        3000, //3800, : new value doesn't work on YAA1FB
         650,
     };
     return timings;
@@ -259,36 +259,6 @@ void GreeYANHeatpumpIR::generateCommand(uint8_t * buffer,
   buffer[5] |= 0x20;
 }
 
-void GreeYAAHeatpumpIR::generateCommand(uint8_t * buffer,
-            uint8_t powerMode, uint8_t operatingMode,
-            uint8_t fanSpeed, uint8_t temperature,
-            uint8_t swingV, uint8_t swingH,
-            bool turboMode, bool iFeelMode) {
-  GreeHeatpumpIR::generateCommand(buffer,
-      powerMode, operatingMode,
-      fanSpeed, temperature,
-      swingV, swingH,
-      turboMode, iFeelMode);
-
-  buffer[2] = GREE_LIGHT_BIT; // bits 0..3 always 0000, bits 4..7 TURBO,LIGHT,HEALTH,X-FAN
-  buffer[3] = 0x50; // bits 4..7 always 0101
-  buffer[5] |= 0x20;
-  buffer[6] = 0x20; // YAA1FB, FAA1FB1, YB1F2 bits 4..7 always 0010
-
-  if (turboMode)
-  {
-    buffer[2] |= GREE_TURBO_BIT;
-  }
-  if (swingV == GREE_VDIR_SWING)
-  {
-    buffer[0] |= GREE_VSWING; // Enable swing by setting bit 6
-  }
-  else if (swingV != GREE_VDIR_AUTO)
-  {
-    buffer[5] = swingV;
-  }
-}
-
 void GreeiFeelHeatpumpIR::generateCommand(uint8_t * buffer,
             uint8_t powerMode, uint8_t operatingMode,
             uint8_t fanSpeed, uint8_t temperature,
@@ -302,6 +272,40 @@ void GreeiFeelHeatpumpIR::generateCommand(uint8_t * buffer,
 
   if (iFeelMode) {
     buffer[5] |= GREE_IFEEL_BIT;
+  }
+}
+
+void GreeYAAHeatpumpIR::generateCommand(uint8_t * buffer,
+            uint8_t powerMode, uint8_t operatingMode,
+            uint8_t fanSpeed, uint8_t temperature,
+            uint8_t swingV, uint8_t swingH,
+            bool turboMode, bool iFeelMode) {
+  GreeiFeelHeatpumpIR::generateCommand(buffer,
+      powerMode, operatingMode,
+      fanSpeed, temperature,
+      swingV, swingH,
+      turboMode, iFeelMode);
+
+  buffer[2] = GREE_LIGHT_BIT | GREE_HEALTH_BIT | GREE_XFAN_BIT; // bits 0..3 always 0000, bits 4..7 TURBO,LIGHT,HEALTH,X-FAN
+  buffer[3] = 0x50; // bits 4..7 always 0101
+  //buffer[5] |= 0x20;
+  buffer[5] = 0x44; // Enable WiFi and iFeel
+  buffer[6] = 0x00; // YAA1FB, FAA1FB1, YB1F2 bits 4..7 always 0010 (0000 on my YAA1FB)
+  buffer[7] = 0x00; // bits 4..7 always 0000
+  // if (iFeelMode) {
+  //   buffer[5] |= 0x04; // According to handheld remote protocol reverse engineering
+  // }
+  if (turboMode)
+  {
+    buffer[2] |= GREE_TURBO_BIT;
+  }
+  if (swingV == GREE_VDIR_SWING)
+  {
+    buffer[0] |= GREE_VSWING; // Enable swing by setting bit 6
+  }
+  else if (swingV != GREE_VDIR_AUTO)
+  {
+    buffer[5] = swingV;
   }
 }
 

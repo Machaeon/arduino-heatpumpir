@@ -147,10 +147,11 @@ class GreeYANHeatpumpIR : public GreeHeatpumpIR
     virtual void calculateChecksum(uint8_t * buffer) override;
 };
 
-class GreeYAAHeatpumpIR : public GreeHeatpumpIR
+class GreeiFeelHeatpumpIR : public GreeHeatpumpIR
 {
   public:
-    GreeYAAHeatpumpIR();
+    using GreeHeatpumpIR::send;
+    void send(IRSender& IR, uint8_t currentTemperature) override;
 
   protected:
     virtual void generateCommand(uint8_t * buffer,
@@ -160,11 +161,10 @@ class GreeYAAHeatpumpIR : public GreeHeatpumpIR
             bool turboMode, bool iFeelMode) override;
 };
 
-class GreeiFeelHeatpumpIR : public GreeHeatpumpIR
+class GreeYAAHeatpumpIR : public GreeiFeelHeatpumpIR
 {
   public:
-    using GreeHeatpumpIR::send;
-    void send(IRSender& IR, uint8_t currentTemperature) override;
+    GreeYAAHeatpumpIR();
 
   protected:
     virtual void generateCommand(uint8_t * buffer,
