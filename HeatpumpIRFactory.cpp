@@ -65,16 +65,22 @@ HeatpumpIR* HeatpumpIRFactory::create(const char *modelName) {
     return new MitsubishiMSYHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("mitsubishi_sez")) == 0) {
     return new MitsubishiSEZKDXXHeatpumpIR();
+  } else if (strcmp_P(modelName, PSTR("olimpia")) == 0) {
+    return new OlimpiaStandardMaestroHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("panasonic_ckp")) == 0) {
     return new PanasonicCKPHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("panasonic_dke")) == 0) {
     return new PanasonicDKEHeatpumpIR();
+  } else if (strcmp_P(modelName, PSTR("panasonic_eke")) == 0) {
+    return new PanasonicEKEHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("panasonic_jke")) == 0) {
     return new PanasonicJKEHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("panasonic_lke")) == 0) {
     return new PanasonicLKEHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("panasonic_nke")) == 0) {
     return new PanasonicNKEHeatpumpIR();
+  } else if (strcmp_P(modelName, PSTR("philco_phs32")) == 0) {
+    return new PhilcoPHS32HeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("samsung_aqv")) == 0) {
     return new SamsungAQVHeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("samsung_fjm")) == 0) {
@@ -89,6 +95,8 @@ HeatpumpIR* HeatpumpIRFactory::create(const char *modelName) {
     return new ZHJG01HeatpumpIR();
   } else if (strcmp_P(modelName, PSTR("ZHLT01")) == 0) {
     return new ZHLT01HeatpumpIR();
+  } else if (strcmp_P(modelName, PSTR("KY-26")) == 0) {
+    return new KY26HeatpumpIR();
   }
 
    return NULL;

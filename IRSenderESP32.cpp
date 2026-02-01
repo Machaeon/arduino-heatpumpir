@@ -1,10 +1,10 @@
-#include <Arduino.h>
+#include "HeatpumpIRCompat.h"
 
 // IRSender implementation for ESP32
-// Tested on R51M/E control with SENSEI air conditioner 
+// Tested on R51M/E control with SENSEI air conditioner
 // Maksym Krasovskyi
 
-#if defined ESP32
+#if defined(ESP32) && defined(ARDUINO)
 #include <IRSender.h>
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
 #include <driver/gpio.h>
@@ -40,7 +40,12 @@ void IRSenderESP32::mark(int markLength)
   ledcWrite(_pwmChannel, 127);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
   while((int)(micros() - beginning) < markLength);
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  ledcDetach(_pin);
+  pinMode(_pin, OUTPUT);
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_reset_pin(static_cast<gpio_num_t>(_pin));
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
   if (_inverted)
     digitalWrite(_pin, HIGH);
   else

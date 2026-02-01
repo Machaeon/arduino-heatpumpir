@@ -4,17 +4,22 @@
 #ifndef IRSender_h
 #define IRSender_h
 
-#include <Arduino.h>
+#include "HeatpumpIRCompat.h"
 
 #if defined(DEBUG) && (DEBUG > 0)
+#ifdef ARDUINO
 #define LOG(...) Serial.print(__VA_ARGS__)
 #define LOGLN(...) Serial.println(__VA_ARGS__)
+#else
+#define LOG(...) ESP_LOGI("HeatpumpIR", __VA_ARGS__)
+#define LOGLN(...) ESP_LOGI("HeatpumpIR", __VA_ARGS__)
+#endif
 #else
 #define LOG(...)
 #define LOGLN(...)
 #endif
 
-#if defined(ESP8266) || defined(ESP32)
+#if defined(ESP8266)
 #include <IRsend.h>  // From IRremoteESP8266 library
 #include <stdint.h>
 #endif
@@ -70,7 +75,7 @@ class IRSenderBitBang : public IRSender
     int _halfPeriodicTime;
 };
 
-#ifdef ESP32
+#if defined(ESP32) && defined(ARDUINO)
 class IRSenderESP32 : public IRSender
 {
   public:
@@ -85,7 +90,7 @@ class IRSenderESP32 : public IRSender
 };
 #endif
 
-#if defined(ESP8266) || defined(ESP32)
+#if defined(ESP8266)
 class IRSenderIRremoteESP8266 : public IRSender
 {
   public:
